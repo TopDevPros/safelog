@@ -11,7 +11,7 @@
     To do: Drop privs. Create a user with write permission to log files.
 
     Copyright 2019-2020 DeNova
-    Last modified: 2020-10-26
+    Last modified: 2020-10-30
 
     This file is open source, licensed under GPLv3 <http://www.gnu.org/licenses/>.
 '''
@@ -22,6 +22,7 @@ import os.path
 import queue
 import socketserver
 import sys
+from shutil import chown
 from subprocess import CalledProcessError
 from threading import Thread
 from traceback import format_exc
@@ -59,7 +60,7 @@ def start():
     '''
         Start the safelog.
 
-        >>> start()
+        <<< start()
         Traceback (most recent call last):
            ...
         SystemExit: This program must be run as root. Current user is ramblin.
@@ -99,7 +100,7 @@ def stop():
     '''
         Stop the safelog.
 
-        >>> stop()
+        <<< stop()
         Traceback (most recent call last):
            ...
         SystemExit: This program must be run as root. Current user is ramblin.
@@ -125,34 +126,6 @@ def stop():
 
 def writer():
     ''' Write log entries from the queue to user log files.'''
-
-    def open_log(user, pathname):
-        debug(f'writer() open or reopen {pathname}')
-
-        # if the log might be open, try to close it
-        if pathname in openfiles:
-            try:
-                openfiles[pathname].close()
-            except:  # 'bare except' because it catches more than "except Exception"
-                pass
-            finally:
-                del openfiles[pathname]
-
-        try:
-            dirname = os.path.dirname(pathname)
-            if not os.path.exists(dirname):
-                os.makedirs(dirname)
-
-            with sudo(user):
-                openfiles[pathname] = open(pathname, 'a')
-            debug(f'writer() opened {pathname}')
-            assert os.path.exists(pathname) # DEBUG
-
-        except PermissionError as pe:
-            debug(pe)
-            why = pathname, why_file_permission_denied(pathname, 'a')
-            msg = f'open("{why}","a") failed:\n\t{pe}'
-            error(msg)
 
     try:
         #debug('start writer')
@@ -202,7 +175,7 @@ def writer():
 
                     pathname = os.path.join(BASE_LOG_DIR, user, logname)
                     if pathname not in openfiles or not os.path.exists(pathname):
-                        open_log(user, pathname)
+                        open_log(user, pathname, openfiles)
 
                     debug(f"writer() {user} write to {message.rstrip()}") # DEBUG
                     logfile = openfiles[pathname]
@@ -211,7 +184,7 @@ def writer():
                         # the log may have been truncated, etc.
                         if (logfile.tell() != os.path.getsize(pathname)):
                             debug(f'log file size changed: {pathname}')
-                            open_log(user, pathname)
+                            open_log(user, pathname, openfiles)
 
                         logfile.write(message)
 
@@ -220,7 +193,7 @@ def writer():
                         tmp_log(f'error while writing to: {pathname}')
                         tmp_log(str(exc))
                         try:
-                            open_log(user, pathname)
+                            open_log(user, pathname, openfiles)
                             logfile = openfiles[pathname]
                             logfile.write(message)
                         except Exception as exc:
@@ -242,6 +215,55 @@ def writer():
         error(exc)
 
     debug('writer() done')
+
+def open_log(user, pathname, openfiles):
+    '''
+        Open the log for the user, creating the log dir if it doesn't exist.
+
+        >>> from denova.os.user import getgid_name, getuid_name, whoami
+        >>> if whoami() == 'root':
+        ...     openfiles = {}
+        ...     user = whoami()
+        ...     log_dir = os.path.join(BASE_LOG_DIR, user)
+        ...     if os.path.exists(log_dir):
+        ...         results = run('rm', '-fr', log_dir)
+        ...     open_log(user, os.path.join(log_dir, 'test.log'), openfiles)
+        ...     os.path.exists(log_dir)
+        ...     statinfo = os.stat(log_dir)
+        ...     getuid_name(statinfo.st_uid) == user
+        ...     getgid_name(statinfo.st_gid) == user
+        True
+        True
+        True
+    '''
+
+    debug(f'writer() open or reopen {pathname}')
+
+    # if the log might be open, try to close it
+    if pathname in openfiles:
+        try:
+            openfiles[pathname].close()
+        except:  # 'bare except' because it catches more than "except Exception"
+            pass
+        finally:
+            del openfiles[pathname]
+
+    try:
+        dirname = os.path.dirname(pathname)
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
+            chown(dirname, user, user)
+
+        with sudo(user):
+            openfiles[pathname] = open(pathname, 'a')
+        debug(f'writer() opened {pathname}')
+        assert os.path.exists(pathname) # DEBUG
+
+    except PermissionError as pe:
+        debug(pe)
+        why = pathname, why_file_permission_denied(pathname, 'a')
+        msg = f'open("{why}","a") failed:\n\t{pe}'
+        error(msg)
 
 def error(why):
     tmp_log(why)
