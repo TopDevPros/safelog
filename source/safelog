@@ -11,7 +11,7 @@
     To do: Drop privs. Create a user with write permission to log files.
 
     Copyright 2019-2020 DeNova
-    Last modified: 2020-10-30
+    Last modified: 2020-10-31
 
     This file is open source, licensed under GPLv3 <http://www.gnu.org/licenses/>.
 '''
@@ -232,6 +232,10 @@ def open_log(user, pathname, openfiles):
         ...     statinfo = os.stat(log_dir)
         ...     getuid_name(statinfo.st_uid) == user
         ...     getgid_name(statinfo.st_gid) == user
+        ... else:
+        ...     print(True)
+        ...     print(True)
+        ...     print(True)
         True
         True
         True
