@@ -11,7 +11,7 @@
     To do: Drop privs. Create a user with write permission to log files.
 
     Copyright 2019-2020 DeNova
-    Last modified: 2020-10-31
+    Last modified: 2020-11-02
 
     This file is open source, licensed under GPLv3 <http://www.gnu.org/licenses/>.
 '''
@@ -63,15 +63,21 @@ def start():
         <<< start()
         Traceback (most recent call last):
            ...
-        SystemExit: This program must be run as root. Current user is ramblin.
+        SystemExit: This program must be run as root. Current user is ...
     '''
 
     thread = None
 
     try:
-        # we require running as root because we're a server and
-        # so we can write to log files as the log user this lets
-        # users clear out their own logs whenever they want
+        # We require running as root because:
+        #   1) safelog is a system-wide server
+        #   2) to create log files with the right ownership and permisions
+        # This lets users clear out their own logs whenever they want.
+
+        # Of course it would be better to create a separate user with
+        # access only to the log dirs, and create a group for users.
+        # But that makes installation a lot harder.
+        # Until we automate that setup, we're must run as root.
         require_user('root')
 
         thread = Thread(target=writer)
