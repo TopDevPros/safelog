@@ -1,14 +1,13 @@
 [Unit]
-Description=Multiprocess-safe logging
-After=network.target
+Description=DeNova Safelog
 
 [Service]
 Type=simple
 # ideally safelog should be installed in sbin, but pypi installs it in bin
 # so we don't specify a path to allow it to work in any environment
-ExecStart=safelog --start
-ExecStop=safelog --stop
-Restart=always
+ExecStart=safelog
+KillSignal=SIGTERM
+Restart=no
 
 [Install]
 WantedBy=multi-user.target

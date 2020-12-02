@@ -1,22 +1,21 @@
 #! /usr/bin/python3
-
 '''
-    Multiprocess-safe logs.
+    Server for Multiprocess-safe logs.
+    Client side is denova.python.log.
 
-    Log server for denova.python.
+    When you install "safelog" from PyPI, all the dependencies, including the
+    client side, are automatically installed.
 
-    See https://docs.python.org/dev/howto/logging-cookbook.html#network-logging
-        file:///usr/share/doc/python3.5/html/library/socketserver.html#module-socketserver
-
-    To do: Drop privs. Create a user with write permission to log files.
+    Get instant multithread, multiprocess, and multiprogram safe logs.
 
     Copyright 2019-2020 DeNova
-    Last modified: 2020-11-02
+    Last modified: 2020-11-30
+
+    To do: Drop privs. Create a user with write permission to log files.
 
     This file is open source, licensed under GPLv3 <http://www.gnu.org/licenses/>.
 '''
 
-import argparse
 import os
 import os.path
 import queue
@@ -50,20 +49,16 @@ DEBUGGING = False
 
 q = queue.Queue()
 
-def main(args):
-    if args.stop:
-        stop()
-    else:
-        start()
-
-def start():
+def main():
     '''
-        Start the safelog.
+        Run the safelog.
 
-        <<< start()
-        Traceback (most recent call last):
-           ...
-        SystemExit: This program must be run as root. Current user is ...
+        >>> try:
+        ...    main()
+        ...    print('Failure')
+        ... except:
+        ...    print('This program must be run as root.')
+        This program must be run as root.
     '''
 
     thread = None
@@ -84,6 +79,8 @@ def start():
         thread.start()
 
         # Create the server, binding to localhost and SAFELOG_PORT
+        # See https://docs.python.org/dev/howto/logging-cookbook.html#network-logging
+        #   file:///usr/share/doc/python3.5/html/library/socketserver.html#module-socketserver
         BIND_ADDR = (SAFELOG_HOST, SAFELOG_PORT)
         server = socketserver.TCPServer(BIND_ADDR, SafelogServer)
 
@@ -91,8 +88,11 @@ def start():
         # interrupt the program with Ctrl-C
         server.serve_forever()
 
+        server.server_close()
+
     except KeyboardInterrupt:
-        pass
+        server.shutdown()
+        server.server_close()
 
     except Exception as exc:
         error(exc)
@@ -101,34 +101,6 @@ def start():
         q.put(None)
         if thread:
             thread.join()
-
-def stop():
-    '''
-        Stop the safelog.
-
-        <<< stop()
-        Traceback (most recent call last):
-           ...
-        SystemExit: This program must be run as root. Current user is ramblin.
-    '''
-
-    # we require running as root because we're a server
-    require_user('root')
-
-    tmp_log('stopping safelog')
-    try:
-        run('fuser', '--kill', f'{SAFELOG_PORT}/tcp')
-    except CalledProcessError as cpe:
-        tmp_log('safelog threw a CalledProcessError')
-        tmp_log(cpe)
-        try:
-            run('killmatch', 'safelog')
-        except:  # 'bare except' because it catches more than "except Exception"
-            tmp_log(format_exc())
-    except Exception as e:
-        tmp_log('safelog threw an unexpected exception')
-        tmp_log(e)
-    tmp_log('safelog stopped')
 
 def writer():
     ''' Write log entries from the queue to user log files.'''
@@ -361,6 +333,5 @@ class SafelogServer(socketserver.StreamRequestHandler):
 
 
 if __name__ == "__main__":
-    args = parse_args()
 
-    main(args)
+    main()
