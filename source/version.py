@@ -2,7 +2,7 @@
     Current distributed version of safelog.
 
     Copyright 2020 DeNova
-    Last modified: 2020-11-29
+    Last modified: 2020-12-06
 '''
 
-SafelogVersion = '1.7.4'
+SAFELOG_VERSION = '1.7.5'
