@@ -8,8 +8,8 @@
 
     Get instant multithread, multiprocess, and multiprogram safe logs.
 
-    Copyright 2019-2020 DeNova
-    Last modified: 2020-11-30
+    Copyright 2019-2021 DeNova
+    Last modified: 2020-01-02
 
     To do: Drop privs. Create a user with write permission to log files.
 
@@ -37,6 +37,11 @@ from denova.python.log import SAFELOG_HOST, SAFELOG_PORT, FIELD_SEPARATOR
 from denova.python._log import log as tmp_log
 from denova.python.times import timestamp
 
+
+CURRENT_VERSION = '1.7.7'
+COPYRIGHT = 'Copyright 2019-2021 DeNova'
+LICENSE = 'GPLv3'
+
 # must be distinct from denova.python.log.FIELD_SEPARATOR
 NEWLINE_SUBSTITUTE = '\x02'
 
@@ -48,6 +53,7 @@ BASE_LOG_DIR = '/var/local/log'
 DEBUGGING = False
 
 q = queue.Queue()
+
 
 def main():
     '''
@@ -261,22 +267,6 @@ def debug(*args):
         msg = '\t'.join(map(str, parts))
         print(msg)
         tmp_log(msg)
-
-def parse_args():
-    ''' Parsed command line. '''
-
-    parser = argparse.ArgumentParser(description='Manage logs in a multiprocessing safe manner.')
-
-    parser.add_argument('--start',
-                        help="Start the safelog",
-                        action='store_true')
-    parser.add_argument('--stop',
-                        help="Stop the safelog",
-                        action='store_true')
-
-    args = parser.parse_args()
-
-    return args
 
 
 class SafelogServer(socketserver.StreamRequestHandler):
