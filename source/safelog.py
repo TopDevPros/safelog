@@ -9,7 +9,7 @@
     Get instant multithread, multiprocess, and multiprogram safe logs.
 
     Copyright 2019-2022 DeNova
-    Last modified: 2022-01-25
+    Last modified: 2022-11-21
 
     To do: Drop privs. Create a user with write permission to log files.
 
@@ -38,7 +38,7 @@ from denova.python._log import log as tmp_log
 from denova.python.times import timestamp
 
 
-CURRENT_VERSION = '1.7.8'
+CURRENT_VERSION = '1.8.0'
 COPYRIGHT = 'Copyright 2019-2022 DeNova'
 LICENSE = 'GPLv3'
 
