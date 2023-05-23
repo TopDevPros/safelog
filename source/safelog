@@ -1,15 +1,15 @@
 #! /usr/bin/python3
 '''
     Server for Multiprocess-safe logs.
-    Client side is denova.python.log.
+    Client side is solidlibs.python.log.
 
     When you install "safelog" from PyPI, all the dependencies, including the
     client side, are automatically installed.
 
     Get instant multithread, multiprocess, and multiprogram safe logs.
 
-    Copyright 2019-2022 DeNova
-    Last modified: 2022-11-21
+    Copyright 2019-2023 safeapps
+    Last modified: 2023-05-17
 
     To do: Drop privs. Create a user with write permission to log files.
 
@@ -26,23 +26,23 @@ from subprocess import CalledProcessError
 from threading import Thread
 from traceback import format_exc
 
-from denova.os.command import run
-from denova.os.fs import why_file_permission_denied
-from denova.os.user import require_user, sudo
-from denova.python.format import to_string
-# constants shared with denova.python.log and safelog are
-# in denova.python.log so they can be imported easily by tools
-from denova.python.log import SAFELOG_HOST, SAFELOG_PORT, FIELD_SEPARATOR
-# safelog itself uses the alternative logging in denova.python._log
-from denova.python._log import log as tmp_log
-from denova.python.times import timestamp
+from solidlibs.os.command import run
+from solidlibs.os.fs import why_file_permission_denied
+from solidlibs.os.user import require_user, sudo
+from solidlibs.python.format import to_string
+# constants shared with solidlibs.python.log and safelog are
+# in solidlibs.python.log so they can be imported easily by tools
+from solidlibs.python.log import SAFELOG_HOST, SAFELOG_PORT, FIELD_SEPARATOR
+# safelog itself uses the alternative logging in solidlibs.python._log
+from solidlibs.python._log import log as tmp_log
+from solidlibs.python.times import timestamp
 
 
-CURRENT_VERSION = '1.8.0'
-COPYRIGHT = 'Copyright 2019-2022 DeNova'
+CURRENT_VERSION = '1.8.1'
+COPYRIGHT = 'Copyright 2019-2023 safeapps'
 LICENSE = 'GPLv3'
 
-# must be distinct from denova.python.log.FIELD_SEPARATOR
+# must be distinct from solidlibs.python.log.FIELD_SEPARATOR
 NEWLINE_SUBSTITUTE = '\x02'
 
 # analogous to /var/log
@@ -120,7 +120,7 @@ def writer():
 
             #debug('dequeued:', data, type(data)) # DEBUG
 
-            # empty data appears to happen when denova.python.log gets an error and
+            # empty data appears to happen when solidlibs.python.log gets an error and
             # doesn't send the data correctly
             if data.strip():
 
@@ -190,7 +190,7 @@ def writer():
                 # debug('writer() write done')
 
             else:
-                debug('writer() got empty data; did denova.python.log and LogHandler send it correctly?')
+                debug('writer() got empty data; did solidlibs.python.log and LogHandler send it correctly?')
 
             q.task_done()
             data = q.get()
@@ -204,7 +204,7 @@ def open_log(user, pathname, openfiles):
     '''
         Open the log for the user, creating the log dir if it doesn't exist.
 
-        >>> from denova.os.user import getgid_name, getuid_name, whoami
+        >>> from solidlibs.os.user import getgid_name, getuid_name, whoami
         >>> if whoami() == 'root':
         ...     openfiles = {}
         ...     user = whoami()
@@ -286,7 +286,7 @@ class SafelogServer(socketserver.StreamRequestHandler):
             if data.strip():
                 q.put_nowait(data)
             else:
-                debug('got empty data; did denova.python.log send it correctly?')
+                debug('got empty data; did solidlibs.python.log send it correctly?')
 
             """
             text = to_string(data.strip())
