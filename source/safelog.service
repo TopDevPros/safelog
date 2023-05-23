@@ -1,5 +1,5 @@
 [Unit]
-Description=DeNova Safelog
+Description=Safelog
 
 [Service]
 Type=simple
