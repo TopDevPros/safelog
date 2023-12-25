@@ -8,8 +8,8 @@
 
     Get instant multithread, multiprocess, and multiprogram safe logs.
 
-    Copyright 2019-2023 safeapps
-    Last modified: 2023-05-17
+    Copyright 2019-2023 TopDevPros
+    Last modified: 2023-10-01
 
     To do: Drop privs. Create a user with write permission to log files.
 
@@ -38,8 +38,8 @@ from solidlibs.python._log import log as tmp_log
 from solidlibs.python.times import timestamp
 
 
-CURRENT_VERSION = '1.8.1'
-COPYRIGHT = 'Copyright 2019-2023 safeapps'
+CURRENT_VERSION = '1.8.3'
+COPYRIGHT = 'Copyright 2019-2023 TopDevPros'
 LICENSE = 'GPLv3'
 
 # must be distinct from solidlibs.python.log.FIELD_SEPARATOR

@@ -5,7 +5,7 @@ Description=Safelog
 Type=simple
 # ideally safelog should be installed in sbin, but pypi installs it in bin
 # so we don't specify a path to allow it to work in any environment
-ExecStart=safelog
+ExecStart=/usr/local/bin/safelog
 KillSignal=SIGTERM
 Restart=no
 

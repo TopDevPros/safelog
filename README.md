@@ -26,6 +26,7 @@ Install
 -------
 
 Just and run it. The safeget-safelog installer will download, verify, and install Safelog.
+
 Quick start
 
 Start the safelog server:
@@ -117,4 +118,4 @@ The safelog server will create directories as needed. If a program bypasses soli
 
 Running a module while in the module directory may not create the log file for that module.
 
-If you are installing Safelog from github, be sure to also install the "solidlibs" package from PyPI.
+If you are installing Safelog from codeber.org, be sure to also install the "solidlibs" package from Codeberg.org.
