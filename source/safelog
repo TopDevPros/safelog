@@ -38,7 +38,7 @@ from solidlibs.python._log import log as tmp_log
 from solidlibs.python.times import timestamp
 
 
-CURRENT_VERSION = '1.8.3'
+CURRENT_VERSION = '1.8.4'
 COPYRIGHT = 'Copyright 2019-2023 TopDevPros'
 LICENSE = 'GPLv3'
 
