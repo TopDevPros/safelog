@@ -25,7 +25,9 @@ Start as many threads, subprocesses, or programs as you like that all write to t
 Install
 -------
 
-Just and run it. The safeget-safelog installer will download, verify, and install Safelog.
+pip install safelog
+
+Or, just and run it. The safeget-safelog installer will download, verify, and install Safelog.
 
 Quick start
 
@@ -38,6 +40,12 @@ Or copy the systemd safelog.service file from your python dist-packages/safelock
 
         systemctl enable safelog
         systemctl start safelog
+
+
+Updates
+-------
+
+All future updates are available at https://codeberg.org/topdevpros/safelog.git
 
 
 How it Works
